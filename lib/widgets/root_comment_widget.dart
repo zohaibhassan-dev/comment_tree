@@ -5,17 +5,19 @@ import 'package:provider/provider.dart';
 class RootCommentWidget extends StatelessWidget {
   final PreferredSizeWidget avatar;
   final Widget content;
+  final bool hadReplies;
 
-  const RootCommentWidget(this.avatar, this.content);
+  const RootCommentWidget(this.avatar, this.content,this.hadReplies);
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: RootPainter(
+      painter: !hadReplies
+          ? null
+          :RootPainter(
         avatar.preferredSize,
         context.watch<TreeThemeData>().lineColor,
         context.watch<TreeThemeData>().lineWidth,
-          Directionality.of(context)
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,8 +40,7 @@ class RootPainter extends CustomPainter {
   late Paint _paint;
   Color? pathColor;
   double? strokeWidth;
-  final TextDirection textDecoration;
-  RootPainter(this.avatar, this.pathColor, this.strokeWidth, this.textDecoration) {
+  RootPainter(this.avatar, this.pathColor, this.strokeWidth) {
     _paint = Paint()
       ..color = pathColor!
       ..style = PaintingStyle.stroke
@@ -49,14 +50,9 @@ class RootPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if(textDecoration == TextDirection.rtl)
-    canvas.translate(size.width, 0);
-    double dx = avatar!.width / 2;
-    if(textDecoration == TextDirection.rtl)
-      dx *= -1;
     canvas.drawLine(
-      Offset(dx, avatar!.height),
-      Offset(dx, size.height),
+      Offset(avatar!.width / 2, avatar!.height),
+      Offset(avatar!.width / 2, size.height),
       _paint,
     );
   }
